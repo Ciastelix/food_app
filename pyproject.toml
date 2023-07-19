@@ -1,10 +1,10 @@
 
 [project]
-name = ""
+name = "diet app"
 version = ""
 description = ""
 authors = [
-    {name = "Ciastelix", email = "tenlegitmati@gmail.com"},
+    {name = "Ciastelix", email = "mateusz.zwierzynski@hotmail.com"},
 ]
 dependencies = [
     "fastapi>=0.100.0",

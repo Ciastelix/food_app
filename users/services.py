@@ -1,5 +1,4 @@
 from repositories import UserRepository
-from models import User
 from schemas import UserIn, UserUpdate
 from schemas import UserOut
 from schemas import TokenData
