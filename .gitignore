@@ -173,3 +173,5 @@ cython_debug/
 *.cql
 
 .vscode/
+.vscode
+.vscode/*
