@@ -1,5 +1,3 @@
-Sure! Here's the documentation for the "diet app" project:
-
 ## diet app
 
 The "diet app" is a Python application built using the FastAPI framework. It provides an API for managing user accounts, generating meal plans, and retrieving recipe information.
