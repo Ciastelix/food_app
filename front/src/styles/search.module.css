@@ -1,0 +1,137 @@
+/* centered contsainer with search bar */
+* {
+  box-sizing: border-box;
+}
+.search-container {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  padding: 0 1rem;
+  margin-top: 1em;
+}
+.search-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem; /* Add margin to separate from advanced search */
+}
+.search-bar input {
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+}
+.search-bar input:focus {
+  border: 1px solid #000;
+}
+
+/* Add more styles as needed */
+
+svg {
+  margin: 0;
+  margin-left: 10px;
+}
+/* advanced-search class to put n elements in two rows responive  using only advanced-search class and no other*/
+.advanced-search {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem;
+}
+.advanced-search .advanced-search-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem;
+}
+.advanced-search .advanced-search-item label {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.advanced-search .advanced-search-item select {
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+}
+.advanced-search .advanced-search-item select:focus {
+  border: 1px solid #000;
+}
+.advanced-search .advanced-search-item input {
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+}
+.advanced-search .advanced-search-item input:focus {
+  border: 1px solid #000;
+}
+/* recipe results in form of card on the screen few in each row */
+.recipe-results {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem;
+}
+
+.recipe-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #ccc;
+  background-color: #000;
+}
+
+.recipe-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease-in-out;
+  margin: 10px;
+  width: calc(25% - 20px);
+  aspect-ratio: 1;
+  text-decoration: none;
+  color: #000;
+}
+
+.recipe-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px 6px 0 0;
+}
+
+.recipe-card .recipe-info {
+  padding: 10px;
+}
+
+.recipe-card h3 {
+  font-size: 1.2rem;
+  margin: 0;
+  white-space: nowrap; /* Prevent title from wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Display ellipsis (...) for overflow text */
+}

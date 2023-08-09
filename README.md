@@ -1,104 +1,72 @@
-## diet app
+# Diet App Documentation
 
-The "diet app" is a Python application built using the FastAPI framework. It provides an API for managing user accounts, generating meal plans, and retrieving recipe information.
+## Project Overview
 
-### Project Dependencies
+The Diet App is a FastAPI-based web application that allows users to manage their diet plans, favorite recipes, and generate meal plans based on their dietary needs and preferences. The application is built using the FastAPI framework and leverages dependency injection, SQLAlchemy for database management, and various external APIs to provide recipe information.
 
-The project has the following dependencies specified in the `pyproject.toml` file:
+## Project Structure
 
-```toml
-[project]
-name = "diet app"
-version = ""
-description = ""
-authors = [
-    {name = "Ciastelix", email = "mateusz.zwierzynski@hotmail.com"},
-]
-dependencies = [
-    "fastapi>=0.100.0",
-    "uvicorn[standard]>=0.22.0",
-    "dependency-injector>=4.41.0",
-    "python-dotenv>=1.0.0",
-    "sqlalchemy>=2.0.16",
-    "werkzeug>=2.3.6",
-    "passlib>=1.7.4",
-    "aiokafka>=0.8.1",
-    "python-jose[cryptography]>=3.3.0",
-    "requests>=2.31.0",
-    "pydantic<2,>1.8",
-    "bcrypt>=4.0.1",
-    "pydantic-core>=2.3.0",
-]
-requires-python = ">=3.11"
-license = {text = "MIT"}
-```
+The project is organized into several modules, each serving a specific purpose:
 
-### Project Structure
+### `users/containers.py`
 
-The project directory structure is as follows:
+This module defines the dependency injection container and configuration for the application. It manages the wiring of various services and providers, including the `UserService`, `UserRepository`, and `Database` instances.
 
-```
-./users
-├── containers.py
-├── db.py
-├── endpoints.py
-├── main.py
-├── models.py
-├── repositories.py
-├── schemas.py
-├── services.py
-└── utils.py
-```
+### `users/db.py`
 
-### Container Configuration (`containers.py`)
+This module defines the `Database` class, responsible for managing the connection to the database. It includes methods for creating the database, managing sessions, and rolling back transactions in case of exceptions.
 
-The `Container` class in `containers.py` is responsible for managing the application's dependencies using the `dependency-injector` library. It sets up dependency injection for various components of the application.
+### `users/endpoints.py`
 
-### Database Configuration (`db.py`)
+This module defines the FastAPI API router and various endpoints for user authentication, recipe retrieval, and user data management. It utilizes the `UserService` to handle user-related operations and JWT authentication for protected endpoints.
 
-The `Database` class in `db.py` defines the SQLAlchemy database configuration. It provides methods for creating a database and managing database sessions.
+### `users/main.py`
 
-### Endpoints (`endpoints.py`)
+This module is the entry point of the FastAPI application. It creates an instance of the FastAPI app, sets up CORS middleware, and includes the API endpoints from the `endpoints.py` module.
 
-The `endpoints.py` file contains the FastAPI router that defines all the API endpoints for the application. It includes endpoints for user authentication, user management, recipe retrieval, and meal plan generation.
+### `users/models.py`
 
-### Main Application (`main.py`)
+This module defines the SQLAlchemy database models used in the application. It includes the `User`, `FavoriteRecipe`, and `Meal` classes, each representing different aspects of user data and relationships.
 
-The `main.py` file is the entry point of the application. It sets up the FastAPI application, initializes the database, and includes the endpoint router.
+### `users/repositories.py`
 
-### Models (`models.py`)
+This module contains the `UserRepository` class, which encapsulates database operations related to users. It interacts with the database to perform actions such as user creation, data retrieval, and authentication.
 
-The `models.py` file contains the SQLAlchemy model definitions for the application's database tables. It defines the `User`, `FavoriteRecipe`, and `Meal` models.
+### `users/schemas.py`
 
-### Repositories (`repositories.py`)
+This module defines Pydantic models that represent data structures used in the application, including user input models (`UserIn`, `UserUpdate`), output models (`UserOut`, `TokenData`), and recipe-related models (`Meal`).
 
-The `repositories.py` file contains the repository classes responsible for interacting with the database. It provides methods for querying and modifying user data, recipe data, and meal data.
+### `users/services.py`
 
-### Schemas (`schemas.py`)
+This module contains the `UserService` class, responsible for handling business logic related to user operations. It uses the `UserRepository` to perform CRUD operations on user data and interacts with external APIs to retrieve recipe information.
 
-The `schemas.py` file defines the Pydantic models used for request and response validation in the application. It includes models for user input, user output, token data, and more.
+### `users/utils.py`
 
-### Services (`services.py`)
+This module includes utility functions and constants used throughout the application. It provides functions for password hashing, JWT token generation, and more. It also defines proportion constants used in generating meal plans.
 
-The `services.py` file contains the service classes that handle business logic for the application. They use the repository classes to interact with the database and provide high-level functionality to the API endpoints.
+### `pyproject.toml`
 
-### Utilities (`utils.py`)
+This file contains project metadata, dependencies, and configuration. It specifies project details, dependencies, Python version compatibility, and license information.
 
-The `utils.py` file contains utility functions used throughout the application. It includes functions for password hashing, token generation, and more.
+## API Endpoints
 
-In order to run the "diet app" project successfully, you need to set up a `.env` file with the appropriate values. The `.env` file should be located in the root directory of the project and should contain the necessary environment variables.
+Here is a summary of the main API endpoints provided by the Diet App:
 
-Please make sure to create a `.env` file and set the following environment variables with their corresponding values:
+- `POST /token`: Authenticate user and generate access token.
+- `POST /token/refresh`: Refresh access token.
+- `POST /users`: Create a new user.
+- `GET /users`: Get a list of all users.
+- `PUT /users`: Update user data.
+- `GET /users/me`: Get user details.
+- `GET /recipes/`: Get recipes by ingredients.
+- `GET /recipes/id/{id}`: Get recipe by ID.
+- `GET /recipes/multiple`: Get recipes by multiple filters.
+- `PUT /users/data/`: Update user data for calculating calorie needs.
+- `POST /user/diets`: Generate meal plan for a given number of days.
+- `GET /users/diets`: Get user's meal plan.
+- `POST /users/favorite/{recipe_id}`: Add a recipe to user's favorite list.
+- `DELETE /users/favorite/{recipe_id}`: Remove a recipe from user's favorite list.
 
-- `DATABASE_URL`: The URL for connecting to your database.
-- `SECRET_KEY`: A secret key used for JWT token generation.
-- `ALGORITHM`: The algorithm used for JWT token encoding.
-- `ACCESS_TOKEN_EXPIRE_MINUTES`: The expiration time for JWT access tokens, in minutes.
-- `KEY`: Your RapidAPI key for accessing the Spoonacular API.
-- `HOST`: The RapidAPI host for accessing the Spoonacular API.
+## Conclusion
 
-Ensure that you have the appropriate values for these environment variables before running the application.
-
-Note: The application relies on the `python-dotenv` library to load the environment variables from the `.env` file. Make sure to install this library (`python-dotenv`) in your Python environment.
-
-This concludes the documentation for the "diet app" project. Let me know if you need any further assistance!
+The Diet App is a comprehensive application that enables users to manage their diet plans and favorite recipes. It provides a variety of API endpoints for user authentication, data management, and recipe retrieval. The application's modular structure, use of dependency injection, and integration with external APIs contribute to its functionality and flexibility.

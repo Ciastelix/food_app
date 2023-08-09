@@ -43,8 +43,8 @@ class UserService:
     def get_recipe_by_multiple(self, query, **kwargs) -> list[dict]:
         return self._repository.get_recipe_by_multiple(query, **kwargs)
 
-    def generate_day(self, user_id: int) -> list[dict]:
-        return self._repository.generate_day(user_id)
+    def generate_day(self, user_id: int, days: int):
+        return self._repository.generate_day(user_id, days)
 
     def get_users_meal_plan(self, user_id: int) -> list[dict]:
         return self._repository.get_users_meal_plan(user_id)
@@ -60,3 +60,6 @@ class UserService:
 
     def remove_favorite_recipe(self, user_id: int, recipe_id: int) -> None:
         self._repository.remove_favorite_recipe(user_id, recipe_id)
+
+    def refresh_token(self, token: str) -> str:
+        return self._repository.refresh_token(token)

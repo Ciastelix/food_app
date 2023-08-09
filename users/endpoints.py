@@ -6,7 +6,7 @@ from dependency_injector.wiring import inject, Provide
 from models import User
 from containers import Container
 from utils import oauth2_scheme
-
+from schemas import LoginCredentials
 
 router = APIRouter()
 
@@ -22,11 +22,19 @@ def get_current_user(
 @router.post("/token", response_model=dict, status_code=200)
 @inject
 async def login_for_access_token(
-    username: str,
-    password: str,
+    credentials: LoginCredentials,
     user_service: UserService = Depends(Provide[Container.user_service]),
 ):
-    return user_service.authenticate_user(username, password)
+    return user_service.authenticate_user(credentials.username, credentials.password)
+
+
+@router.post("/token/refresh", status_code=200)
+@inject
+async def refresh_token(
+    token: str,
+    user_service: UserService = Depends(Provide[Container.user_service]),
+):
+    return user_service.refresh_token(token)
 
 
 @router.post("/users", response_model=UserOut, status_code=201)
@@ -166,16 +174,17 @@ async def update_user_data(
     return user_service.update_user_data((await current_user).id, user)
 
 
-@router.post("/user/diets", status_code=201, response_model=UserOut)
+@router.post("/user/diets", status_code=201)
 @inject
 async def generate_day(
+    days: int = 0,
     current_user: User = Depends(get_current_user),
     user_service: UserService = Depends(Provide[Container.user_service]),
 ):
-    return user_service.generate_day((await current_user).id)
+    return user_service.generate_day((await current_user).id, days)
 
 
-@router.get("/users/diets", status_code=200, response_model=UserOut)
+@router.get("/users/diets", status_code=200)
 @inject
 async def get_diet(
     current_user: User = Depends(get_current_user),

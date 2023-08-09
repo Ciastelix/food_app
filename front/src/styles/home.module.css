@@ -1,0 +1,19 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.home-container h1 {
+  color: #4d50d0;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.home-container h2 {
+  color: #795ed4;
+  font-size: 2rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+}

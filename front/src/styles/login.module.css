@@ -1,0 +1,89 @@
+/* custom inputs for text and password within centered container */
+.login-input {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 30%;
+  margin: 0.5em;
+}
+.login-container h1 {
+  color: #795ed4;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0.5em;
+}
+
+.login-input input,
+select {
+  width: 100%;
+  padding: 0.5em;
+  margin: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+form {
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+select option {
+  padding: 0.5em;
+  margin: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  text-align: center;
+}
+.login-input input:focus,
+select:focus {
+  outline: none;
+  border: 1px solid #795ed4;
+}
+.login-input input[type='submit'] {
+  width: 100%;
+  padding: 0.5em;
+  margin: 0.5em;
+  border: none;
+  border-radius: 3px;
+  background-color: #795ed4;
+  color: #f6e9ed;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.login-input input[type='submit']:hover {
+  background-color: #4d50d0;
+  color: #e8f1cb;
+}
+.login-input input[type='submit']:disabled {
+  background-color: #ccc;
+  color: #f6e9ed;
+  cursor: not-allowed;
+}
+.login-input input[type='submit']:disabled:hover {
+  background-color: #ccc;
+  color: #f6e9ed;
+}
+.login-input input[type='submit']:active {
+  background-color: #4d50d0;
+  color: #e8f1cb;
+}
+.login-input input[type='submit']:focus {
+  outline: none;
+}
+.login-input p {
+  margin: 0.5em;
+  color: #795ed4;
+  font-size: 16px;
+  font-weight: 500;
+}
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}

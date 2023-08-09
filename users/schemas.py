@@ -7,12 +7,12 @@ class UserIn(BaseModel):
     username: str
     password: str
     email: str
+    gender: str
 
 
 class UserUpdate(BaseModel):
     weight: int = None
     height: int = None
-    gender: str = None
     meals_count: int = None
     activity: float = None
     goal: str = None
@@ -50,3 +50,8 @@ class UserOut(BaseModel):
 class TokenData(BaseModel):
     id: int = None
     exp: int
+
+
+class LoginCredentials(BaseModel):
+    username: str
+    password: str

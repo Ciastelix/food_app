@@ -17,11 +17,13 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 from os import environ
 from dotenv import load_dotenv
 import requests
-from random import choice
+from random import randint, choice
 from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 from datetime import timedelta
 from schemas import TokenData
+from datetime import datetime
+
 
 load_dotenv()
 
@@ -61,17 +63,49 @@ class UserRepository:
             raise credentials_exception
         return TokenData(id=user.id, exp=payload.get("exp"))
 
+    
+    def refresh_token(self, token: str) -> dict:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            
+            exp = payload.get("exp")
+            if exp is None or datetime.utcfromtimestamp(
+                exp
+            ) <= datetime.utcnow() + timedelta(minutes=10):
+                
+                user_id = payload.get("id")
+                if user_id is None:
+                    raise JWTError("Token does not contain user id")
+                new_token_data = {"id": user_id}
+                new_access_token = create_access_token(
+                    new_token_data, expires_delta=timedelta(minutes=15)
+                )
+                return {
+                    "access_token": new_access_token,
+                    "exp": datetime.utcnow() + timedelta(minutes=15),
+                }
+            else:
+                
+                return {"access_token": token, "exp": datetime.utcfromtimestamp(exp)}
+        except JWTError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not refresh token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
     def create_user(self, user: UserIn) -> User:
         with self.session_factory() as session:
             user_entity = User(
                 username=user.username,
                 password=hash_password(user.password),
                 email=user.email,
+                gender=user.gender,
             )
             try:
                 add_to_db(session, user_entity)
             except IntegrityError:
-                raise IntegrityError
+                raise IntegrityError("Username or email already exists.", None, None)
             return user_entity
 
     def get_user(self, user_id: int) -> User:
@@ -103,7 +137,7 @@ class UserRepository:
                 raise NoResultFound
             weight = user.weight = user_.weight
             height = user.height = user_.height
-            gender = user.gender = user_.gender
+            gender = user.gender
             age = user.age = user_.age
             goal = user.goal = user_.goal
             activity = user.activity = user_.activity
@@ -151,10 +185,19 @@ class UserRepository:
                     headers={"WWW-Authenticate": "Bearer"},
                 )
             access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            refresh_expire = timedelta(days=30)
+            refresh_token = create_access_token(
+                data={"username": username}, expires_delta=refresh_expire
+            )
+
             access_token = create_access_token(
                 data={"username": username}, expires_delta=access_token_expires
             )
-        return {"access_token": access_token, "token_type": "bearer"}
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+        }
 
     def get_recipe_ingrediants(
         self, ingredients: int, numer: int, ignorePantry: bool, ranking: int
@@ -177,8 +220,8 @@ class UserRepository:
         response = requests.get(url, headers=headers)
         return response.json()
 
-    def get_recipe_by_multiple(self, **kwargs) -> list[dict]:
-        if "query" in kwargs.keys():
+    def get_recipe_by_multiple(self, query, **kwargs) -> list[dict]:
+        if query:
             url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByNutrients"
         else:
             url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch"
@@ -186,12 +229,16 @@ class UserRepository:
         response = requests.get(url, headers=headers, params={**params})
         return response.json()
 
-    def add_meal(self, user_id: int, recipe_id: int) -> None:
+    def add_meal(self, user_id: int, recipe_id: int, days: int = 0) -> None:
         with self.session_factory() as session:
-            meal = Meal(user_id=user_id, recipe_id=recipe_id)
+            meal = Meal(
+                user_id=user_id,
+                recipe_id=recipe_id,
+                date=datetime.now() + timedelta(days=days),
+            )
             add_to_db(session, meal)
 
-    def generate_day(self, user_id: int) -> list[dict]:
+    def generate_day(self, user_id: int, days: int) -> list[dict]:
         with self.session_factory() as session:
             user = session.query(User).filter_by(id=user_id).first()
             calories = user.calories
@@ -219,14 +266,21 @@ class UserRepository:
             else:
                 raise ValueError
 
+            day = []
             meals = []
-            for i in proprotion:
-                recipes = self.get_recipe_by_multiple(
-                    maxCalories=calories * i, minCalories=(calories * i) - 100
-                )
-                choice_recipe = choice(recipes["results"])
-                meals.append(choice_recipe)
-                self.add_meal(user_id, choice_recipe["id"])
+            i = 0
+            while i <= days:
+                for j in proprotion:
+                    recipes = self.get_recipe_by_multiple(
+                        maxCalories=(calories * j),
+                    )
+
+                    choice_recipe = choice(recipes)
+                    day.append(choice_recipe)
+                    self.add_meal(user_id, choice_recipe["id"], i)
+                meals.append({datetime.now() + timedelta(days=i): day})
+                i += 1
+
             return meals
 
     def get_users_meal_plan(self, user_id: int) -> list[Meal]:
@@ -235,6 +289,22 @@ class UserRepository:
             if not user:
                 raise NoResultFound
             meals = session.query(Meal).filter_by(user_id=user_id).all()
+            days = [i.date for i in meals]
+            days = list(set(days))
+            meals = []
+            for day in days:
+                meals.append(
+                    {
+                        day: [
+                            {
+                                "recipe": meal.recipe_id,
+                            }
+                            for meal in session.query(Meal)
+                            .filter_by(user_id=user_id, date=day)
+                            .all()
+                        ]
+                    }
+                )
             return meals
 
     def add_favorite_recipe(self, user_id: int, recipe_id: int) -> None:
